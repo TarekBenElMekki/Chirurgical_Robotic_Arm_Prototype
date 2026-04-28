@@ -11,6 +11,7 @@ install(PROGRAMS
   scripts/status_monitor.py
   scripts/trajectory_gateway.py
   scripts/joint_state_freshener.py
+  scripts/change_monitor.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
