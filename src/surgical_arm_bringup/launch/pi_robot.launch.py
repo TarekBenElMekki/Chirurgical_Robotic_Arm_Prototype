@@ -17,11 +17,7 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration('use_rviz')
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'use_rviz',
-            default_value='false',
-            description='Launch Raspberry Pi monitoring RViz'
-        ),
+        DeclareLaunchArgument('use_rviz', default_value='false'),
 
         Node(
             package='robot_state_publisher',
@@ -33,48 +29,32 @@ def generate_launch_description():
         Node(
             package='controller_manager',
             executable='ros2_control_node',
+            remappings=[('/joint_states', '/raw_joint_states')],
             parameters=[robot_description, controllers],
             output='screen'
         ),
 
-        TimerAction(period=2.0, actions=[
-            ExecuteProcess(
-                cmd=[
-                    'ros2', 'control', 'load_controller',
-                    '--set-state', 'active',
-                    'joint_state_broadcaster'
-                ],
+        TimerAction(period=4.0, actions=[
+            Node(
+                package='controller_manager',
+                executable='spawner',
+                arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
                 output='screen'
             )
         ]),
 
-        TimerAction(period=3.0, actions=[
-            ExecuteProcess(
-                cmd=[
-                    'ros2', 'control', 'load_controller',
-                    '--set-state', 'active',
-                    'hardware_arm_controller'
-                ],
+        TimerAction(period=5.0, actions=[
+            Node(
+                package='controller_manager',
+                executable='spawner',
+                arguments=['hardware_arm_controller', '--controller-manager', '/controller_manager'],
                 output='screen'
             )
         ]),
-
-        Node(
-            package='v4l2_camera',
-            executable='v4l2_camera_node',
-            name='camera',
-            output='screen',
-            parameters=[
-                {
-                    'video_device': '/dev/video0',
-                    'image_size': [640, 480]
-                }
-            ]
-        ),
 
         Node(
             package='surgical_arm_bringup',
-            executable='status_monitor.py',
+            executable='joint_state_freshener.py',
             output='screen'
         ),
 
@@ -86,7 +66,7 @@ def generate_launch_description():
 
         Node(
             package='surgical_arm_bringup',
-            executable='joint_state_freshener.py',
+            executable='status_monitor.py',
             output='screen'
         ),
 
