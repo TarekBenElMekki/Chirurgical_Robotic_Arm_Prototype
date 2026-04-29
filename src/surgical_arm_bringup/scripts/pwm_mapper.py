@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 import math
 import rclpy
+
+def safe_shutdown():
+    if rclpy.ok():
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
+
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
@@ -57,7 +65,7 @@ def main():
     node = PwmMapper()
     rclpy.spin(node)
     node.destroy_node()
-    rclpy.shutdown()
+    safe_shutdown()
 
 
 if __name__ == '__main__':

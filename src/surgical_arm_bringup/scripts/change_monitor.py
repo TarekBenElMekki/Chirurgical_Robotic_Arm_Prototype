@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 import rclpy
+
+def safe_shutdown():
+    if rclpy.ok():
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
+
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from control_msgs.msg import JointTrajectoryControllerState
@@ -72,7 +80,7 @@ def main():
     except KeyboardInterrupt:
         pass
     node.destroy_node()
-    rclpy.shutdown()
+    safe_shutdown()
 
 if __name__ == '__main__':
     main()
