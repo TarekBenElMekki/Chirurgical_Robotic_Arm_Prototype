@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, TimerAction, DeclareLaunchArgument
+from launch.actions import TimerAction, DeclareLaunchArgument
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -11,7 +11,7 @@ def generate_launch_description():
     pkg = get_package_share_directory('surgical_arm_bringup')
     urdf = os.path.join(pkg, 'urdf', 'surgical_arm.urdf.xacro')
     controllers = os.path.join(pkg, 'config', 'ros2_controllers.yaml')
-    rviz_config = os.path.join(pkg, 'rviz', 'pi_monitor.rviz')
+    rviz_config = os.path.join(pkg, 'rviz', 'surgical_arm.rviz')
 
     robot_description = {'robot_description': xacro.process_file(urdf).toxml()}
     use_rviz = LaunchConfiguration('use_rviz')
@@ -73,7 +73,7 @@ def generate_launch_description():
         Node(
             package='rviz2',
             executable='rviz2',
-            name='pi_monitor_rviz',
+            name='wsl_control_validation_rviz',
             output='screen',
             arguments=['-d', rviz_config],
             condition=IfCondition(use_rviz)
