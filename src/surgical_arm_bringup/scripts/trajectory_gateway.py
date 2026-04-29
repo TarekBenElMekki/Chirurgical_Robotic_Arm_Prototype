@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 import copy
 import rclpy
+
+def safe_shutdown():
+    if rclpy.ok():
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
+
 from rclpy.node import Node
 from rclpy.action import ActionServer, ActionClient
 from control_msgs.action import FollowJointTrajectory
@@ -114,7 +122,7 @@ def main():
     except KeyboardInterrupt:
         pass
     node.destroy_node()
-    rclpy.shutdown()
+    safe_shutdown()
 
 
 if __name__ == '__main__':

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 import rclpy
+
+def safe_shutdown():
+    if rclpy.ok():
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
+
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory
@@ -27,8 +35,14 @@ class StatusMonitor(Node):
 
 def main():
     rclpy.init()
-    rclpy.spin(StatusMonitor())
-    rclpy.shutdown()
+    node = StatusMonitor()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        safe_shutdown()
 
 if __name__ == '__main__':
     main()

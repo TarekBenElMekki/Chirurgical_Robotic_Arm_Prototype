@@ -5,3 +5,5 @@ log/
 __pycache__/
 .vscode/
 .DS_Store
+.project_bundle/
+.project_bundle/

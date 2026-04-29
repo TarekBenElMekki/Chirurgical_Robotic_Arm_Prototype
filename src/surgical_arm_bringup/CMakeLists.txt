@@ -10,6 +10,7 @@ install(DIRECTORY launch config urdf rviz
 install(PROGRAMS
   scripts/status_monitor.py
   scripts/trajectory_gateway.py
+  scripts/pwm_mapper.py
   scripts/joint_state_freshener.py
   scripts/change_monitor.py
   DESTINATION lib/${PROJECT_NAME}
