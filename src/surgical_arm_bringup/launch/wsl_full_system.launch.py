@@ -9,9 +9,9 @@ import os
 def generate_launch_description():
     pkg = get_package_share_directory('surgical_arm_bringup')
 
-    pi_robot_launch = IncludeLaunchDescription(
+    wsl_sim_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg, 'launch', 'pi_robot.launch.py')
+            os.path.join(pkg, 'launch', 'wsl_sim_control.launch.py')
         ),
         launch_arguments={
             'use_rviz': 'false',
@@ -36,7 +36,7 @@ def generate_launch_description():
         output='screen'
     )
     return LaunchDescription([
-        pi_robot_launch,
+        wsl_sim_control_launch,
         moveit_launch,
         pwm_mapper,
     ])
