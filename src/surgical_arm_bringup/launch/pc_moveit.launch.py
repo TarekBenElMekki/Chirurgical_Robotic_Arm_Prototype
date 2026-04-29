@@ -20,7 +20,6 @@ def generate_launch_description():
     joint_limits = load_yaml(os.path.join(pkg, 'config', 'joint_limits.yaml'))
     controllers = load_yaml(os.path.join(pkg, 'config', 'moveit_controllers.yaml'))
     planning = load_yaml(os.path.join(pkg, 'config', 'planning.yaml'))
-    ompl = load_yaml(os.path.join(pkg, 'config', 'ompl_planning.yaml'))
 
     common_params = [
         
@@ -30,7 +29,6 @@ def generate_launch_description():
         joint_limits,
         controllers,
         planning,
-        ompl,
 
         # Correct parameters (ONLY ONCE)
         {'joint_state_topic': '/joint_states_fresh'},
