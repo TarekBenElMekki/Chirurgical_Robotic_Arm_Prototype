@@ -19,7 +19,7 @@ def generate_launch_description():
     kinematics = load_yaml(os.path.join(pkg, 'config', 'kinematics.yaml'))
     joint_limits = load_yaml(os.path.join(pkg, 'config', 'joint_limits.yaml'))
     controllers = load_yaml(os.path.join(pkg, 'config', 'moveit_controllers.yaml'))
-    planning = load_yaml(os.path.join(pkg, 'config', 'ompl_planning.yaml'))
+    planning = load_yaml(os.path.join(pkg, 'config', 'planning.yaml'))
 
     common_params = [
         robot_description,
