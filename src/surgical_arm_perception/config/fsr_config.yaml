@@ -1,0 +1,7 @@
+fsr_publisher:
+  ros__parameters:
+    mock_mode: true
+    publish_rate_hz: 30.0
+    sensor_count: 4
+    topic_raw: /fsr/raw
+    topic_normalized: /fsr/normalized
