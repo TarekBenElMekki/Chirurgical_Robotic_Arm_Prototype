@@ -23,13 +23,7 @@ def generate_launch_description():
     ompl = load_yaml(os.path.join(pkg, 'config', 'ompl_planning.yaml'))
 
     common_params = [
-        {'planning_plugin': 'ompl_interface/OMPLPlanner'},
-        {'request_adapters': 'default_planner_request_adapters/AddTimeOptimalParameterization '
-                             'default_planner_request_adapters/FixWorkspaceBounds '
-                             'default_planner_request_adapters/FixStartStateBounds '
-                             'default_planner_request_adapters/FixStartStateCollision '
-                             'default_planner_request_adapters/FixStartStatePathConstraints'},
-
+        
         robot_description,
         robot_description_semantic,
         kinematics,
