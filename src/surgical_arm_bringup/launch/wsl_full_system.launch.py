@@ -35,17 +35,8 @@ def generate_launch_description():
         name='pwm_mapper',
         output='screen'
     )
-
-    pwm_echo_hint = Node(
-        package='surgical_arm_bringup',
-        executable='status_monitor.py',
-        name='status_monitor',
-        output='screen'
-    )
-
     return LaunchDescription([
         pi_robot_launch,
         moveit_launch,
         pwm_mapper,
-        pwm_echo_hint,
     ])
