@@ -35,8 +35,14 @@ class StatusMonitor(Node):
 
 def main():
     rclpy.init()
-    rclpy.spin(StatusMonitor())
-    safe_shutdown()
+    node = StatusMonitor()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        safe_shutdown()
 
 if __name__ == '__main__':
     main()

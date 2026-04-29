@@ -63,10 +63,13 @@ class PwmMapper(Node):
 def main():
     rclpy.init()
     node = PwmMapper()
-    rclpy.spin(node)
-    node.destroy_node()
-    safe_shutdown()
-
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        safe_shutdown()
 
 if __name__ == '__main__':
     main()
