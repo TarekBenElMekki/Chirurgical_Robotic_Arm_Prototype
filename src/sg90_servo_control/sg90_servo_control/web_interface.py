@@ -222,9 +222,6 @@ HTML_PAGE = r"""<!DOCTYPE html>
       </div>
     </section>
 
-    <div class="warning">
-      SG90 has no encoder feedback. The displayed state is the last commanded angle published by the ROS node, not measured physical position.
-    </div>
   </main>
 
   <script>

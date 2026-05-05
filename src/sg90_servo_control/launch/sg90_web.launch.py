@@ -21,6 +21,12 @@ def generate_launch_description():
                 "max_pulse_us": 2000.0,
                 "pwm_frequency_hz": 50.0,
 
+                "control_mode": "move_then_detach",
+                "min_move_time_sec": 0.35,
+                "max_move_time_sec": 1.60,
+                "seconds_per_degree": 0.008,
+                "extra_settle_time_sec": 0.20,
+
                 "command_topic": "/sg90/angle_deg",
                 "state_topic": "/sg90/state_deg",
                 "publish_rate_hz": 10.0,
