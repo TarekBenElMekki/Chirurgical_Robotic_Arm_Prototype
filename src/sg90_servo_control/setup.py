@@ -23,6 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "sg90_servo_node = sg90_servo_control.servo_node:main",
+            "ros2_control_servo_bridge = sg90_servo_control.ros2_control_servo_bridge:main",
             "sg90_web_interface = sg90_servo_control.web_interface:main",
         ],
     },
