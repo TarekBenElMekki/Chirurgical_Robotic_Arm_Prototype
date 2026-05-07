@@ -41,6 +41,27 @@ clean_ws() {
   rm -rf build install log
 }
 
+is_wsl() {
+  grep -qi microsoft /proc/version 2>/dev/null
+}
+
+require_real_raspi_hardware() {
+  if is_wsl && [ "${FORCE_HARDWARE:-0}" != "1" ]; then
+    echo "ERROR: This command needs real Raspberry Pi hardware."
+    echo "You are running inside WSL, which has no GPIO, CSI camera, or SPI devices."
+    echo ""
+    echo "Allowed in WSL:"
+    echo "  ./run.sh build"
+    echo "  ./run.sh rebuild"
+    echo "  ./run.sh check"
+    echo "  ./run.sh control"
+    echo ""
+    echo "Run this command on the Raspberry Pi instead."
+    echo "To force anyway: FORCE_HARDWARE=1 ./run.sh <command>"
+    exit 2
+  fi
+}
+
 check_ws() {
   source_workspace
   chmod +x check_raspi_ready.sh
@@ -63,6 +84,7 @@ control_no_servo() {
 }
 
 control_with_servo() {
+  require_real_raspi_hardware
   source_workspace
   export ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-42}"
   export ROS_LOCALHOST_ONLY="${ROS_LOCALHOST_ONLY:-0}"
@@ -70,6 +92,7 @@ control_with_servo() {
 }
 
 sensors() {
+  require_real_raspi_hardware
   source_workspace
   export ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-42}"
   export ROS_LOCALHOST_ONLY="${ROS_LOCALHOST_ONLY:-0}"
@@ -77,6 +100,7 @@ sensors() {
 }
 
 full_no_servo() {
+  require_real_raspi_hardware
   source_workspace
   export ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-42}"
   export ROS_LOCALHOST_ONLY="${ROS_LOCALHOST_ONLY:-0}"

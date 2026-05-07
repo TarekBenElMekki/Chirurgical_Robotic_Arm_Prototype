@@ -9,3 +9,4 @@ __pycache__/
 .project_bundle/
 RASPI_DEPLOY/
 .project_snapshot/
+.lgd-*
