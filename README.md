@@ -1,166 +1,103 @@
-# 🦾 Chirurgical Robotic Arm Prototype (v0.1)
+# Chirurgical Robotic Arm Prototype
 
-## 📌 Overview
+## Version status
 
-This project implements a **distributed robotic system** using:
+- v0.6.0: previous stable milestone with the original src architecture, FSR, SG90 servo, perception, and ros2_control experiments.
+- v1.0.0: new production-oriented architecture split into PC and RASPI.
 
-- 🖥️ PC → Motion planning (MoveIt 2 + RViz)
-- 🍓 Raspberry Pi → Execution (ros2_control)
-- 🔗 Custom gateway → Robust trajectory handling
-- 📊 Monitoring → Real-time state observation
+## v1 architecture
 
-The system allows a user to:
-- Plan motion in RViz
-- Execute trajectories
-- Monitor execution in real time
+This version separates the system by machine:
 
----
+PC:
+- v2_description
+- v2_moveit_config
+- v2_visualization
 
-## 🧠 Architecture
+RASPI:
+- v2_description
+- v2_control
+- v2_sensors
 
+## PC side
 
-RViz (PC)
-↓
-MoveIt 2
-↓
-/arm_controller/follow_joint_trajectory
-↓
-Trajectory Gateway (Raspberry Pi)
-↓
-/hardware_arm_controller/follow_joint_trajectory
-↓
-ros2_control
-↓
-Joint states feedback
+The PC runs RViz, MoveIt, the robot description, the unified dashboard markers, the compressed camera display, the FSR level display, and the motor telemetry display.
 
+Main launch:
 
----
+    cd ~/v2/PC
+    source install/setup.bash
+    export ROS_DOMAIN_ID=42
+    export ROS_LOCALHOST_ONLY=0
+    ros2 launch v2_visualization pc_dashboard.launch.py
 
-## ⚙️ Features
+## Raspberry Pi side
 
-- ✅ Full MoveIt → ros2_control pipeline
-- ✅ Robust trajectory retiming (gateway node)
-- ✅ Real-time feedback monitoring
-- ✅ Dual RViz setup (control + monitoring)
-- ✅ Clean debugging (only changes displayed)
-- ✅ One-launch-per-machine architecture
+The Raspberry Pi runs the final-position trajectory controller, SG90 servo driver, CSI camera launch through camera_ros, and MCP3202 FSR publisher.
 
----
+Main control launch:
 
-## 🚀 How to Run (Linux)
+    cd ~/v2/RASPI
+    source install/setup.bash
+    export ROS_DOMAIN_ID=42
+    export ROS_LOCALHOST_ONLY=0
+    ros2 launch v2_control raspi_control.launch.py enable_servo:=false
 
-### 🔵 Raspberry Pi side
+Real servo mode:
 
-```bash
-source ~/surgical_arm_ws/install/setup.bash
-export ROS_DOMAIN_ID=42
-export ROS_LOCALHOST_ONLY=0
+    ros2 launch v2_control raspi_control.launch.py enable_servo:=true
 
-ros2 launch surgical_arm_bringup pi_robot.launch.py use_rviz:=true
-🟢 PC side
-source ~/surgical_arm_ws/install/setup.bash
-export ROS_DOMAIN_ID=42
-export ROS_LOCALHOST_ONLY=0
+Sensor launch:
 
-ros2 launch surgical_arm_bringup pc_moveit.launch.py
-🟡 Debug (change monitor)
-ros2 run surgical_arm_bringup change_monitor.py
-🪟 One-Click Windows Launch
+    ros2 launch v2_sensors raspi_sensors.launch.py enable_camera:=true enable_fsr:=true
 
-You can launch the full system using a single .bat file.
+## Important design decision
 
-📄 run_system.bat
-@echo off
+MoveIt may generate many trajectory points. The Raspberry Pi controller intentionally uses only the final point:
 
-echo Starting ROS2 Surgical Arm System...
+    trajectory.points[-1]
 
-REM === RASPI SIDE ===
-start cmd /k wsl -e bash -lc "source ~/surgical_arm_ws/install/setup.bash && export ROS_DOMAIN_ID=42 && export ROS_LOCALHOST_ONLY=0 && ros2 launch surgical_arm_bringup pi_robot.launch.py use_rviz:=true"
+This means the servo receives only the final planned target, not every intermediate MoveIt point.
 
-REM === PC SIDE ===
-start cmd /k wsl -e bash -lc "source ~/surgical_arm_ws/install/setup.bash && export ROS_DOMAIN_ID=42 && export ROS_LOCALHOST_ONLY=0 && ros2 launch surgical_arm_bringup pc_moveit.launch.py"
+## Topics
 
-REM === DEBUG (CHANGE MONITOR) ===
-start cmd /k wsl -e bash -lc "source ~/surgical_arm_ws/install/setup.bash && export ROS_DOMAIN_ID=42 && export ROS_LOCALHOST_ONLY=0 && ros2 run surgical_arm_bringup change_monitor.py"
+Camera:
 
-echo System launched.
-pause
-▶️ Usage
-Save as run_system.bat
-Double-click
-System starts automatically:
-Raspberry Pi execution
-PC MoveIt control
-Debug monitor
-🔍 Monitoring
+    /camera/image_raw/compressed
 
-The system includes a custom node:
+FSR:
 
-change_monitor.py
+    /fsr/raw
+    /fsr/normalized
+    /fsr/force_n
 
-It prints ONLY when values change:
+Motor:
 
-Joint positions
-Desired controller values
-Actual controller values
+    /motor/command_angle_deg
+    /motor/real_angle_deg
+    /motor/error_deg
 
-This avoids noisy logs and improves debugging.
+## Raspberry Pi deployment
 
-🔧 Custom Components
-🔁 Trajectory Gateway
-Fixes invalid MoveIt trajectories
-Ensures time consistency
-Prevents controller rejection
-📡 Joint State Freshener
-Updates timestamps
-Ensures MoveIt receives valid state
-📊 Status Monitor
-Publishes execution status
-Helps track received commands
-📁 Project Structure
-surgical_arm_ws/
-└── src/
-    └── surgical_arm_bringup/
-        ├── launch/
-        │   ├── pc_moveit.launch.py
-        │   └── pi_robot.launch.py
-        ├── config/
-        ├── scripts/
-        │   ├── trajectory_gateway.py
-        │   ├── change_monitor.py
-        │   ├── joint_state_freshener.py
-        │   └── status_monitor.py
-        └── urdf/
-⚠️ Known Limitations
-❗ URDF lacks collision geometry (visual only)
-❗ Uses mock hardware (no real motors yet)
-❗ Camera may not work on WSL (/dev/video0)
-🔜 Next Steps
-🔧 Integrate real motor drivers (GPIO / PWM)
-📐 Add collision geometry to URDF
-📊 Add logging & performance analysis
-🤖 Improve control precision
-👨‍🔬 Author
+The RASPI folder contains:
 
-Tarek Ben El Mekki
-Master Thesis – Surgical Robotics System
+    install_raspi_dependencies.sh
+    check_raspi_ready.sh
+    RUN_ON_RASPI.md
 
-📌 Version
-v0.1 – Stable execution + monitoring system
+Before running on the Pi:
 
----
+    cd ~/v2/RASPI
+    source /opt/ros/humble/setup.bash
+    ./install_raspi_dependencies.sh
 
-# 🚀 Final step (push it)
+Then build:
 
-```bash
-git add README.md
-git commit -m "v0.1: full professional README with architecture and launcher"
-git push
-🧠 Result
+    colcon build --symlink-install
+    source install/setup.bash
 
-Your repo now looks like:
+## Git milestones
 
-✔ Professional
-✔ Understandable
-✔ Runnable in one click
-✔ Thesis-quality documentation
+- v0.6.0: old architecture completion milestone.
+- v1.0.0: PC/RASPI split with unified RViz dashboard and production-ready Raspberry Pi workspace.
+- Development continues on v1-dev.
