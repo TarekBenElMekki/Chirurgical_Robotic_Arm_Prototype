@@ -30,6 +30,7 @@ class ServoDriver(Node):
         self.declare_parameter("min_command_delta_deg", 0.5)
         self.declare_parameter("hold_pwm", True)
         self.declare_parameter("detach_on_shutdown", False)
+        self.declare_parameter("release_after_command_sec", 0.6)
 
         self.gpiochip = int(self.get_parameter("gpiochip").value)
         self.gpio_pin = int(self.get_parameter("gpio_pin").value)
@@ -48,7 +49,9 @@ class ServoDriver(Node):
         self.min_command_delta_deg = float(self.get_parameter("min_command_delta_deg").value)
         self.hold_pwm = bool(self.get_parameter("hold_pwm").value)
         self.detach_on_shutdown = bool(self.get_parameter("detach_on_shutdown").value)
+        self.release_after_command_sec = float(self.get_parameter("release_after_command_sec").value)
 
+        self.release_timer = None
         self.last_command_angle = None
         self.last_estimated_real_angle = None
 
@@ -76,6 +79,7 @@ class ServoDriver(Node):
         self.get_logger().info(f"Pulse range: {self.min_pulse_us:.0f}-{self.max_pulse_us:.0f} us")
         self.get_logger().info(f"PWM frequency: {self.pwm_frequency_hz:.1f} Hz")
         self.get_logger().info(f"Hold PWM: {self.hold_pwm}")
+        self.get_logger().info(f"Release after command: {self.release_after_command_sec:.2f} s")
 
     def clamp_angle(self, angle):
         return max(self.min_angle, min(self.max_angle, float(angle)))
@@ -154,6 +158,21 @@ class ServoDriver(Node):
         except Exception as exc:
             self.get_logger().warn(f"Servo detach failed: {exc}")
 
+    def schedule_detach(self):
+        if self.release_timer is not None:
+            self.release_timer.cancel()
+
+        def detach_once():
+            self.detach_servo()
+            if self.release_timer is not None:
+                self.release_timer.cancel()
+                self.release_timer = None
+
+        self.release_timer = self.create_timer(
+            max(0.05, self.release_after_command_sec),
+            detach_once,
+        )
+
     def command_callback(self, msg):
         angle = self.clamp_angle(msg.data)
 
@@ -165,7 +184,7 @@ class ServoDriver(Node):
         self.write_servo(angle)
 
         if not self.hold_pwm:
-            self.detach_servo()
+            self.schedule_detach()
 
     def destroy_node(self):
         try:

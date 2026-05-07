@@ -24,7 +24,7 @@ def generate_launch_description():
         parameters=[
             {
                 "gpiochip": 0,
-                "gpio_pin": 18,
+                "gpio_pin": 23,
                 "min_angle_deg": 0.0,
                 "max_angle_deg": 180.0,
                 "min_pulse_us": 1000.0,
@@ -34,8 +34,9 @@ def generate_launch_description():
                 "real_angle_topic": "/motor/real_angle_deg",
                 "error_topic": "/motor/error_deg",
                 "min_command_delta_deg": 0.5,
-                "hold_pwm": True,
-                "detach_on_shutdown": False,
+                "hold_pwm": False,
+                "detach_on_shutdown": True,
+                "release_after_command_sec": 0.5,
             }
         ],
     )
