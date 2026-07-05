@@ -1,0 +1,17 @@
+{
+  "case_id": "S-0142",
+  "action": "SUTURING",
+  "operator_name": "TAREK BEN EL MEKKI",
+  "latency_ms": 28,
+  "fps": 30,
+  "force_n": 2.8,
+  "depth_mm": 42,
+  "last_action": "JAW CLOSE",
+  "latency_label": "LINK",
+  "video_status_text": "VIDEO STATUS: OFFLINE",
+  "reconnect_text": "AUTO-RECONNECT: 2 s",
+  "force_topic": "/force/newton",
+  "force_limit_topic": "/force/limit_n",
+  "force_limit_n": 15.0,
+  "raspi_host": "100.112.77.4"
+}
